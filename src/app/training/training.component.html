@@ -1,0 +1,215 @@
+<!--Header-->
+<section class="container-fluid">
+    <section class="row bg-success">
+        <h2>Training Portal</h2>
+        <button class="btn interactbtn ml-5 mt-1" data-toggle="modal" data-target="#addModal">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            Schedule Event
+        </button>
+        <span class="mt-2 pl-5 ml-5">Scheduled Events:
+            <span class="font-weight-bold">{{scheduleCount}}</span>
+        </span>
+        <input class="ml-5 w-25" type="text" placeholder="Please enter Training name to search" [(ngModel)]="input">
+    </section>
+</section>
+
+<!-- List of Schedules -->
+<section class="bg-info container-fluid mt-3">
+    <section class="row">
+        <section class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <th>S.No</th>
+                    <th>Training Name</th>
+                    <th>Department</th>
+                    <th>Date and Time</th>
+                    <th>Duration</th>
+                    <th>Meeting Room</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                   <tr>
+                        <div class="norecords" *ngIf="scheduleCount == 0">No records Found</div>
+                   </tr> 
+                    <tr *ngFor = "let schedule of scheduleList | searchFilter:input : 'name'; let row=index">
+                        <td>{{row + 1}}</td>
+                        <td>{{schedule.name}}</td>
+                        <td>{{schedule.department}}</td>
+                        <td>{{schedule.datetime}}</td>
+                        <td>{{schedule.duration}}</td>
+                        <td>{{schedule.meetroom}}</td>
+                        <td>
+                            <button class="btn mt interactbtn" data-toggle="modal" data-target="#editModal" (click)="getSchedule(schedule.id)">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                <span class="small">Edit</span>
+                            </button>
+                            <button class="btn mt ml-2 interactbtn" data-toggle="modal" data-target="#deleteModal" (click)="getSchedule(schedule.id)">
+                                <i class="fa fa-minus" aria-hidden="true"></i>
+                                <span class="small">Del</span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </section>
+</section>
+
+<!--Create Schedule Popup-->
+<!-- The Modal -->
+<div class="modal fade" id="addModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Schedule new training</h4>
+                <button type="button" class="close" data-dismiss="modal" (click)="clearModelData()">×</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form (ngSubmit)="scheduleForm.form.valid" #scheduleForm="ngForm">
+                    <div class="form-group">
+                        <label for="name">Training Name:</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter Training Name" [(ngModel)]="model.name" name="name" required
+                            #name="ngModel">
+                        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+                            Training Name is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department:</label>
+                        <input type="text" class="form-control" id="department" placeholder="Enter Department" [(ngModel)]="model.department" name="department" required
+                            #department="ngModel">
+                        <div [hidden]="department.valid || department.pristine" class="alert alert-danger">
+                            Department is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="datetime">Date and Time:</label>
+                        <input type="text" class="form-control" id="datetime" placeholder="Enter Date and Time" [(ngModel)]="model.datetime" name="datetime" required
+                            #datetime="ngModel">
+                        <div [hidden]="datetime.valid || datetime.pristine" class="alert alert-danger">
+                            Date and Time is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration:</label>
+                        <input type="text" class="form-control" id="duration" placeholder="Enter Duration" [(ngModel)]="model.duration" name="duration" #duration="ngModel" required>
+                        <div [hidden]="duration.valid || duration.pristine" class="alert alert-danger">
+                            Duration is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea class="form-control" id="description" name="description" [(ngModel)]="model.description" #description="ngModel" ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="meetroom">Meeting Room:</label>
+                        <input type="text" class="form-control" id="meetroom" placeholder="Enter Meeting Room" [(ngModel)]="model.meetroom" name="meetroom" #meetroom="ngModel" required>
+                        <div [hidden]="meetroom.valid || meetroom.pristine" class="alert alert-danger">
+                            Meeting Room is required
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit" (click)="addSchedule()">Save</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="clearModelData()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Edit Schedule Popup-->
+<!-- The Modal -->
+<div class="modal fade" id="editModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Schedule Information</h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form name="form" (ngSubmit)="scheduleForm.form.valid" #scheduleForm="ngForm">
+                    <div class="form-group">
+                        <label for="name">Training Name:</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter Training Name" [(ngModel)]="editModel.name" name="name" required
+                            #name="ngModel">
+                        <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+                            Training Name is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department:</label>
+                        <input type="text" class="form-control" id="department" placeholder="Enter Department" [(ngModel)]="editModel.department" name="department" required
+                            #department="ngModel">
+                    
+                        <div [hidden]="department.valid || department.pristine" class="alert alert-danger">
+                            Department is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="datetime">Date and Time:</label>
+                        <input type="text" class="form-control" id="datetime" placeholder="Enter Date and Time" [(ngModel)]="editModel.datetime" name="datetime" required
+                            #datetime="ngModel">
+                        
+                        <div [hidden]="datetime.valid || datetime.pristine" class="alert alert-danger">
+                            Date and Time is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration:</label>
+                        <input type="text" class="form-control" id="duration" placeholder="Enter Duration" [(ngModel)]="editModel.duration" name="duration" #duration="ngModel" required>
+                       
+                        <div [hidden]="duration.valid || duration.pristine" class="alert alert-danger">
+                            Duration is required
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea class="form-control" id="description" name="description" [(ngModel)]="editModel.description" #description="ngModel"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="meetroom">Meeting Room:</label>
+                        <input type="text" class="form-control" id="meetroom" placeholder="Enter Meeting Room" [(ngModel)]="editModel.meetroom" name="meetroom" #meetroom="ngModel" required>
+                        <div [hidden]="meetroom.valid || meetroom.pristine" class="alert alert-danger">
+                            Meeting Room is required
+                        </div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit" (click)="updateSchedule()">Update</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="clearModelData()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Delete Schedule Popup-->
+<!-- The Modal -->
+<div class="modal fade" id="deleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Schedule</h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <h3>Are you sure? Do you want to delete the this 
+                    <span class="text-danger">{{delScheduleName}}</span> Schedule</h3>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="submit" (click)="deleteConfirm()">Delete</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
